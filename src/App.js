@@ -1,26 +1,37 @@
-import React from 'react';
-import logo from './logo.svg';
+import React, { Component } from 'react';
+
+import axios from 'axios';
+
 import './App.css';
 
-function App() {
-  return (
-    <div className="App">
-      <header className="App-header">
-        <img src={logo} className="App-logo" alt="logo" />
-        <p>
-          Edit <code>src/App.js</code> and save to reload.
-        </p>
-        <a
-          className="App-link"
-          href="https://reactjs.org"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          Learn React
-        </a>
-      </header>
-    </div>
-  );
-}
+import AppBar from './components/AppBar';
+import SearchBar from './components/SearchBar';
+import Table from './components/Table';
 
-export default App;
+export default class App extends Component {
+  constructor(props) {
+    super(props);
+    this.state = {
+      meteorites: []
+    };
+  }
+
+  async componentDidMount() {
+    const meteorites = await axios.get(
+      'https://data.nasa.gov/resource/gh4g-9sfh.json'
+    );
+
+    await this.setState({ meteorites: meteorites.data });
+    console.log(this.state);
+  }
+
+  render() {
+    return (
+      <div className='App'>
+        <AppBar />
+        <SearchBar />
+        <Table meteorites={this.state.meteorites} />
+      </div>
+    );
+  }
+}

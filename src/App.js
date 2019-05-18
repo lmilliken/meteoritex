@@ -1,9 +1,7 @@
 import React, { Component } from 'react';
 
-import axios from 'axios';
-
 import './App.css';
-
+import axios from 'axios';
 import AppBar from './components/AppBar';
 import SearchBar from './components/SearchBar';
 import Table from './components/Table';
@@ -17,12 +15,11 @@ export default class App extends Component {
   }
 
   async componentDidMount() {
-    const meteorites = await axios.get(
-      'https://data.nasa.gov/resource/gh4g-9sfh.json'
-    );
-
-    await this.setState({ meteorites: meteorites.data });
-    console.log(this.state);
+    // const meteorites = await axios.get(
+    //   'https://data.nasa.gov/resource/gh4g-9sfh.json'
+    // );
+    // await this.setState({ meteorites: meteorites.data });
+    // console.log('length: ' + typeof meteorites.data);
   }
 
   render() {
@@ -30,7 +27,7 @@ export default class App extends Component {
       <div className='App'>
         <AppBar />
         <SearchBar />
-        <Table meteorites={this.state.meteorites} />
+        <Table />
       </div>
     );
   }

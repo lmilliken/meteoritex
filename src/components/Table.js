@@ -144,7 +144,9 @@ class CustomizedTable extends Component {
   constructor(props) {
     super(props);
     this.state = {
-      meteorites: [],
+      meteoritesAll: [],
+      meteoritesResult: [],
+      searchTerm: props.searchTerm,
       page: 0,
       rowsPerPage: 25
     };
@@ -155,8 +157,35 @@ class CustomizedTable extends Component {
       'https://data.nasa.gov/resource/gh4g-9sfh.json'
     );
     // console.log('table props: ' + meteorites);
-    await this.setState({ meteorites: meteorites.data });
+    await this.setState({
+      meteoritesAll: meteorites.data,
+      meteoritesResult: meteorites.data
+    });
     //console.log('table rows: ' + util.inspect(this.state.meteorites));
+  }
+
+  async componentWillReceiveProps(nextProps) {
+    await this.setState({ searchTerm: nextProps.searchTerm });
+    if (this.state.searchTerm === '') {
+      this.setState({
+        meteoritesResult: this.state.meteoritesAll
+      });
+    } else {
+      const searchTerm = this.state.searchTerm.toLowerCase();
+      const meteoritesResult = this.state.meteoritesAll.filter(m =>
+        m.name.toLowerCase().includes(searchTerm)
+      );
+      console.log({ meteoritesResult });
+      this.setState({ meteoritesResult });
+    }
+  }
+
+  updateSearchResults() {
+    if (this.state.searchTerm === '') {
+      this.setState({
+        meteoritesResult: this.state.meteoritesAll
+      });
+    }
   }
 
   handleChangePage = (event, page) => {
@@ -173,7 +202,10 @@ class CustomizedTable extends Component {
     const { rowsPerPage, page } = this.state;
     const emptyRows =
       rowsPerPage -
-      Math.min(rowsPerPage, this.state.meteorites.length - page * rowsPerPage);
+      Math.min(
+        rowsPerPage,
+        this.state.meteoritesResult.length - page * rowsPerPage
+      );
     // console.log(this.state.meteorites[0]);
     return (
       <Paper className={classes.root}>
@@ -194,8 +226,8 @@ class CustomizedTable extends Component {
               </TableRow>
             </TableHead>
             <TableBody>
-              {this.state.meteorites.length > 0 &&
-                this.state.meteorites
+              {this.state.meteoritesResult.length > 0 &&
+                this.state.meteoritesResult
                   .slice(page * rowsPerPage, page * rowsPerPage + rowsPerPage)
                   .map(row => (
                     <TableRow className={classes.row} key={row.id}>
@@ -238,8 +270,8 @@ class CustomizedTable extends Component {
                   rowsPerPageOptions={[25, 50, 100]}
                   colSpan={9}
                   count={
-                    this.state.meteorites.length
-                      ? this.state.meteorites.length
+                    this.state.meteoritesResult.length
+                      ? this.state.meteoritesResult.length
                       : 0
                   }
                   rowsPerPage={rowsPerPage}

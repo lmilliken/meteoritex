@@ -3,7 +3,7 @@ import PropTypes from 'prop-types';
 import { withStyles } from '@material-ui/core/styles';
 import Paper from '@material-ui/core/Paper';
 import InputBase from '@material-ui/core/InputBase';
-import Divider from '@material-ui/core/Divider';
+import ClearIcon from '@material-ui/icons/Clear';
 import IconButton from '@material-ui/core/IconButton';
 import Button from '@material-ui/core/Button';
 
@@ -22,31 +22,62 @@ const styles = {
   iconButton: {
     padding: 10
   },
-  divider: {
-    width: 1,
-    height: 28,
-    margin: 4
+  clear: {
+    color: '#DCDCDC',
+    cursor: 'pointer'
   }
 };
 
-function CustomizedInputBase(props) {
-  const { classes } = props;
+class CustomizedInputBase extends React.Component {
+  constructor(props) {
+    super(props);
+    this.state = {
+      searchTerm: ''
+    };
 
-  return (
-    <Paper className={classes.root} elevation={1}>
-      <InputBase className={classes.input} placeholder='Enter search terms' />
+    this.handleChange = this.handleChange.bind(this);
+    this.handleSubmit = this.handleSubmit.bind(this);
+    this.handleClear = this.handleClear.bind(this);
+  }
 
-      <Divider className={classes.divider} />
-      <IconButton
-        color='primary'
-        className={classes.iconButton}
-        aria-label='Directions'
-      />
-      <Button variant='contained' color='primary' className={classes.button}>
-        Search
-      </Button>
-    </Paper>
-  );
+  handleSubmit(event) {
+    event.preventDefault();
+    this.props.handleSearch(this.state.searchTerm);
+    console.log('term: ', this.state.searchTerm);
+  }
+
+  handleChange(event) {
+    event.preventDefault();
+    this.setState({ searchTerm: event.target.value });
+  }
+
+  handleClear() {
+    this.setState({ searchTerm: '' });
+  }
+
+  render() {
+    const { classes } = this.props;
+
+    return (
+      <Paper className={classes.root} elevation={1}>
+        <InputBase
+          className={classes.input}
+          placeholder='Enter search terms'
+          onChange={this.handleChange}
+          value={this.state.searchTerm}
+        />
+        <ClearIcon className={classes.clear} onClick={this.handleClear} />
+        <Button
+          variant='contained'
+          color='primary'
+          className={classes.button}
+          onClick={this.handleSubmit}
+        >
+          Search
+        </Button>
+      </Paper>
+    );
+  }
 }
 
 CustomizedInputBase.propTypes = {

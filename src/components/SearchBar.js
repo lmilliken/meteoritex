@@ -4,7 +4,6 @@ import { withStyles } from '@material-ui/core/styles';
 import Paper from '@material-ui/core/Paper';
 import InputBase from '@material-ui/core/InputBase';
 import ClearIcon from '@material-ui/icons/Clear';
-import IconButton from '@material-ui/core/IconButton';
 import Button from '@material-ui/core/Button';
 
 const styles = {
@@ -18,9 +17,6 @@ const styles = {
   input: {
     marginLeft: 8,
     flex: 1
-  },
-  iconButton: {
-    padding: 10
   },
   clear: {
     color: '#DCDCDC',
@@ -40,14 +36,12 @@ class CustomizedInputBase extends React.Component {
     this.handleClear = this.handleClear.bind(this);
   }
 
-  handleSubmit(event) {
-    event.preventDefault();
+  handleSubmit() {
     this.props.handleSearch(this.state.searchTerm);
-    console.log('term: ', this.state.searchTerm);
+    // console.log('term: ', this.state.searchTerm);
   }
 
   handleChange(event) {
-    event.preventDefault();
     this.setState({ searchTerm: event.target.value });
   }
 
@@ -67,12 +61,7 @@ class CustomizedInputBase extends React.Component {
           value={this.state.searchTerm}
         />
         <ClearIcon className={classes.clear} onClick={this.handleClear} />
-        <Button
-          variant='contained'
-          color='primary'
-          className={classes.button}
-          onClick={this.handleSubmit}
-        >
+        <Button variant='contained' color='primary' onClick={this.handleSubmit}>
           Search
         </Button>
       </Paper>

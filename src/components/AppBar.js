@@ -8,6 +8,12 @@ import Typography from '@material-ui/core/Typography';
 const styles = {
   root: {
     flexGrow: 1
+  },
+  app: {
+    backgroundColor: '#1a237e'
+  },
+  title: {
+    color: 'white'
   }
 };
 
@@ -16,9 +22,9 @@ function SimpleAppBar(props) {
 
   return (
     <div className={classes.root}>
-      <AppBar position='static' color='default'>
+      <AppBar position='static' className={classes.app}>
         <Toolbar>
-          <Typography variant='h6' color='inherit'>
+          <Typography variant='h6' className={classes.title}>
             Meteorite Explorer
           </Typography>
         </Toolbar>

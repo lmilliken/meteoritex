@@ -10,121 +10,22 @@ import TableFooter from '@material-ui/core/TableFooter';
 import TablePagination from '@material-ui/core/TablePagination';
 import Paper from '@material-ui/core/Paper';
 
-import IconButton from '@material-ui/core/IconButton';
-import FirstPageIcon from '@material-ui/icons/FirstPage';
-import KeyboardArrowLeft from '@material-ui/icons/KeyboardArrowLeft';
-import KeyboardArrowRight from '@material-ui/icons/KeyboardArrowRight';
-import LastPageIcon from '@material-ui/icons/LastPage';
-
 import axios from 'axios';
-import util from 'util';
-//pagination stuff
-const actionsStyles = theme => ({
-  root: {
-    flexShrink: 0,
-    color: theme.palette.text.secondary,
-    marginLeft: theme.spacing.unit * 2.5
-  }
-});
+import TablePaginationActionsWrapped from './TablePagination';
 
-class TablePaginationActions extends React.Component {
-  handleFirstPageButtonClick = event => {
-    this.props.onChangePage(event, 0);
-  };
-
-  handleBackButtonClick = event => {
-    this.props.onChangePage(event, this.props.page - 1);
-  };
-
-  handleNextButtonClick = event => {
-    this.props.onChangePage(event, this.props.page + 1);
-  };
-
-  handleLastPageButtonClick = event => {
-    this.props.onChangePage(
-      event,
-      Math.max(0, Math.ceil(this.props.count / this.props.rowsPerPage) - 1)
-    );
-  };
-
-  render() {
-    const { classes, count, page, rowsPerPage, theme } = this.props;
-
-    return (
-      <div className={classes.root}>
-        <IconButton
-          onClick={this.handleFirstPageButtonClick}
-          disabled={page === 0}
-          aria-label='First Page'
-        >
-          {theme.direction === 'rtl' ? <LastPageIcon /> : <FirstPageIcon />}
-        </IconButton>
-        <IconButton
-          onClick={this.handleBackButtonClick}
-          disabled={page === 0}
-          aria-label='Previous Page'
-        >
-          {theme.direction === 'rtl' ? (
-            <KeyboardArrowRight />
-          ) : (
-            <KeyboardArrowLeft />
-          )}
-        </IconButton>
-        <IconButton
-          onClick={this.handleNextButtonClick}
-          disabled={page >= Math.ceil(count / rowsPerPage) - 1}
-          aria-label='Next Page'
-        >
-          {theme.direction === 'rtl' ? (
-            <KeyboardArrowLeft />
-          ) : (
-            <KeyboardArrowRight />
-          )}
-        </IconButton>
-        <IconButton
-          onClick={this.handleLastPageButtonClick}
-          disabled={page >= Math.ceil(count / rowsPerPage) - 1}
-          aria-label='Last Page'
-        >
-          {theme.direction === 'rtl' ? <FirstPageIcon /> : <LastPageIcon />}
-        </IconButton>
-      </div>
-    );
-  }
-}
-
-TablePaginationActions.propTypes = {
-  classes: PropTypes.object.isRequired,
-  count: PropTypes.number.isRequired,
-  onChangePage: PropTypes.func.isRequired,
-  page: PropTypes.number.isRequired,
-  rowsPerPage: PropTypes.number.isRequired,
-  theme: PropTypes.object.isRequired
-};
-
-const TablePaginationActionsWrapped = withStyles(actionsStyles, {
-  withTheme: true
-})(TablePaginationActions);
-
-// let counter = 0;
-// function createData(name, calories, fat) {
-//   counter += 1;
-//   return { id: counter, name, calories, fat };
-// }
-
-//table cell stuff
+//<CustomTableCell/> stuff
 const CustomTableCell = withStyles(theme => ({
   head: {
-    backgroundColor: theme.palette.common.black,
-    color: theme.palette.common.white
+    backgroundColor: '#FFB300',
+    color: theme.palette.common.black
   },
   body: {
     fontSize: 14
   }
 }))(TableCell);
-// marginTop: theme.spacing.unit * 3,
 
-const styles = theme => ({
+//CustomizedTable
+const tableStyles = theme => ({
   root: {
     width: '95%',
     margin: 'auto',
@@ -156,15 +57,16 @@ class CustomizedTable extends Component {
     const meteorites = await axios.get(
       'https://data.nasa.gov/resource/gh4g-9sfh.json'
     );
-    // console.log('table props: ' + meteorites);
+
     await this.setState({
       meteoritesAll: meteorites.data,
       meteoritesResult: meteorites.data
     });
-    //console.log('table rows: ' + util.inspect(this.state.meteorites));
   }
 
   async componentWillReceiveProps(nextProps) {
+    // console.log('component will receive props');
+    // console.log('meteoritesResult: ', this.state.meteoritesResult);
     await this.setState({ searchTerm: nextProps.searchTerm });
     if (this.state.searchTerm === '') {
       this.setState({
@@ -175,16 +77,8 @@ class CustomizedTable extends Component {
       const meteoritesResult = this.state.meteoritesAll.filter(m =>
         m.name.toLowerCase().includes(searchTerm)
       );
-      console.log({ meteoritesResult });
-      this.setState({ meteoritesResult });
-    }
-  }
 
-  updateSearchResults() {
-    if (this.state.searchTerm === '') {
-      this.setState({
-        meteoritesResult: this.state.meteoritesAll
-      });
+      this.setState({ meteoritesResult });
     }
   }
 
@@ -197,7 +91,6 @@ class CustomizedTable extends Component {
   };
 
   render() {
-    // console.log('table rows: ' + this.props.classes.root);
     const { classes } = this.props;
     const { rowsPerPage, page } = this.state;
     const emptyRows =
@@ -206,87 +99,79 @@ class CustomizedTable extends Component {
         rowsPerPage,
         this.state.meteoritesResult.length - page * rowsPerPage
       );
-    // console.log(this.state.meteorites[0]);
     return (
       <Paper className={classes.root}>
-        {/* {props.meteorites[0]}  */}
-        <div className={classes.tableWrapper}>
-          <Table className={classes.table}>
-            <TableHead>
-              <TableRow>
-                <CustomTableCell>Name</CustomTableCell>
-                <CustomTableCell align='right'>Id</CustomTableCell>
-                <CustomTableCell align='right'>Name Type</CustomTableCell>
-                <CustomTableCell align='right'>Rec Class</CustomTableCell>
-                <CustomTableCell align='right'>Mass (g)</CustomTableCell>
-                <CustomTableCell align='right'>Fall</CustomTableCell>
-                <CustomTableCell align='right'>Year</CustomTableCell>
-                <CustomTableCell align='right'>Latitude</CustomTableCell>
-                <CustomTableCell align='right'>Longitude</CustomTableCell>
+        <Table className={classes.table}>
+          <TableHead>
+            <TableRow>
+              <CustomTableCell>Name</CustomTableCell>
+              <CustomTableCell align='right'>Id</CustomTableCell>
+              <CustomTableCell align='right'>Name Type</CustomTableCell>
+              <CustomTableCell align='right'>Rec Class</CustomTableCell>
+              <CustomTableCell align='right'>Mass (g)</CustomTableCell>
+              <CustomTableCell align='right'>Fall</CustomTableCell>
+              <CustomTableCell align='right'>Year</CustomTableCell>
+              <CustomTableCell align='right'>Latitude</CustomTableCell>
+              <CustomTableCell align='right'>Longitude</CustomTableCell>
+            </TableRow>
+          </TableHead>
+          <TableBody>
+            {this.state.meteoritesResult.length > 0 &&
+              this.state.meteoritesResult
+                .slice(page * rowsPerPage, page * rowsPerPage + rowsPerPage)
+                .map(row => (
+                  <TableRow className={classes.row} key={row.id}>
+                    <CustomTableCell component='th' scope='row'>
+                      {row.name}
+                    </CustomTableCell>
+                    <CustomTableCell align='right'>{row.id}</CustomTableCell>
+                    <CustomTableCell align='right'>
+                      {row.nametype}
+                    </CustomTableCell>
+                    <CustomTableCell align='right'>
+                      {row.recclass}
+                    </CustomTableCell>
+                    <CustomTableCell align='right'>{row.mass}</CustomTableCell>
+                    <CustomTableCell align='right'>{row.fall}</CustomTableCell>
+                    <CustomTableCell align='right'>
+                      {new Date(row.year).getFullYear()}
+                    </CustomTableCell>
+                    <CustomTableCell align='right'>
+                      {row.reclat}
+                    </CustomTableCell>
+                    <CustomTableCell align='right'>
+                      {row.reclong}
+                    </CustomTableCell>
+                  </TableRow>
+                ))}
+            {emptyRows > 0 && (
+              <TableRow style={{ height: 48 * emptyRows }}>
+                <CustomTableCell colSpan={9} />
               </TableRow>
-            </TableHead>
-            <TableBody>
-              {this.state.meteoritesResult.length > 0 &&
-                this.state.meteoritesResult
-                  .slice(page * rowsPerPage, page * rowsPerPage + rowsPerPage)
-                  .map(row => (
-                    <TableRow className={classes.row} key={row.id}>
-                      <CustomTableCell component='th' scope='row'>
-                        {row.name}
-                      </CustomTableCell>
-                      <CustomTableCell align='right'>{row.id}</CustomTableCell>
-                      <CustomTableCell align='right'>
-                        {row.nametype}
-                      </CustomTableCell>
-                      <CustomTableCell align='right'>
-                        {row.recclass}
-                      </CustomTableCell>
-                      <CustomTableCell align='right'>
-                        {row.mass}
-                      </CustomTableCell>
-                      <CustomTableCell align='right'>
-                        {row.fall}
-                      </CustomTableCell>
-                      <CustomTableCell align='right'>
-                        {new Date(row.year).getFullYear()}
-                      </CustomTableCell>
-                      <CustomTableCell align='right'>
-                        {row.reclat}
-                      </CustomTableCell>
-                      <CustomTableCell align='right'>
-                        {row.reclong}
-                      </CustomTableCell>
-                    </TableRow>
-                  ))}
-              {emptyRows > 0 && (
-                <TableRow style={{ height: 48 * emptyRows }}>
-                  <CustomTableCell colSpan={9} />
-                </TableRow>
-              )}
-            </TableBody>
-            <TableFooter>
-              <TableRow>
-                <TablePagination
-                  rowsPerPageOptions={[25, 50, 100]}
-                  colSpan={9}
-                  count={
-                    this.state.meteoritesResult.length
-                      ? this.state.meteoritesResult.length
-                      : 0
-                  }
-                  rowsPerPage={rowsPerPage}
-                  page={page}
-                  SelectProps={{
-                    native: true
-                  }}
-                  onChangePage={this.handleChangePage}
-                  onChangeRowsPerPage={this.handleChangeRowsPerPage}
-                  ActionsComponent={TablePaginationActionsWrapped}
-                />
-              </TableRow>
-            </TableFooter>
-          </Table>
-        </div>
+            )}
+          </TableBody>
+          <TableFooter>
+            <TableRow>
+              <TablePagination
+                rowsPerPageOptions={[25, 50, 100]}
+                colSpan={9}
+                count={
+                  this.state.meteoritesResult.length
+                    ? this.state.meteoritesResult.length
+                    : 0
+                }
+                rowsPerPage={rowsPerPage}
+                page={page}
+                SelectProps={{
+                  native: true
+                }}
+                onChangePage={this.handleChangePage}
+                onChangeRowsPerPage={this.handleChangeRowsPerPage}
+                ActionsComponent={TablePaginationActionsWrapped}
+              />
+            </TableRow>
+          </TableFooter>
+        </Table>
       </Paper>
     );
   }
@@ -296,4 +181,4 @@ CustomizedTable.propTypes = {
   classes: PropTypes.object.isRequired
 };
 
-export default withStyles(styles)(CustomizedTable);
+export default withStyles(tableStyles)(CustomizedTable);
